@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.onimurasame.obstacleavoid.ObstacleAvoidGame
 import com.onimurasame.obstacleavoid.config.GameConfig
 
+class DesktopLauncher {}
 
 fun main(arg: Array<String>) {
     val config = LwjglApplicationConfiguration()

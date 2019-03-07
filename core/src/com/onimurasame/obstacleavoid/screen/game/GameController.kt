@@ -1,21 +1,12 @@
 package com.onimurasame.obstacleavoid.screen.game
 
-import com.badlogic.gdx.Screen
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.GlyphLayout
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.utils.viewport.FitViewport
-import com.badlogic.gdx.utils.viewport.Viewport
-import com.onimurasame.obstacleavoid.config.AssetPath
 import com.onimurasame.obstacleavoid.config.DifficultyLevel
 import com.onimurasame.obstacleavoid.config.GameConfig
 import com.onimurasame.obstacleavoid.entity.Obstacle
 import com.onimurasame.obstacleavoid.entity.Player
-import com.onimurasame.obstacleavoid.util.*
-import com.onimurasame.obstacleavoid.util.debug.DebugCameraController
+import com.onimurasame.obstacleavoid.util.GdxArray
+import com.onimurasame.obstacleavoid.util.isNotEmpty
 
 
 class GameController {
@@ -48,13 +39,27 @@ class GameController {
         player.update()
         blockPlayerFromLeavingTheWorld()
 
-        updateObstacles()
         createNewObstacle(delta)
+        updateObstacles()
+        removePastObstacles()
+
+
         updateScore(delta)
         updateDisplayScore(delta)
 
         if (playerCollidedWithObstacle()) {
             lives--
+        }
+    }
+
+    private fun removePastObstacles() {
+        if(obstacles.isNotEmpty()) {
+            val first = obstacles.first()
+            val minObstacleY = -Obstacle.SIZE
+
+            if (first.y < minObstacleY) {
+                obstacles.removeValue(first, true)
+            }
         }
     }
 
@@ -93,7 +98,7 @@ class GameController {
         if (obstacleTimer >= GameConfig.OBSTACLE_SPAWN_TIME) {
             obstacleTimer = 0f
 
-            val obstacleX = MathUtils.random(0f + Obstacle.BOUNDS_RADIUS, GameConfig.WORLD_WIDTH - Obstacle.BOUNDS_RADIUS)
+            val obstacleX = MathUtils.random(0f + Obstacle.HALF_SIZE, GameConfig.WORLD_WIDTH - Obstacle.HALF_SIZE)
             val obstacle = Obstacle()
 
             obstacle.setPosition(obstacleX, GameConfig.WORLD_HEIGHT)

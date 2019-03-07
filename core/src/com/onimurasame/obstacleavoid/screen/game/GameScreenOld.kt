@@ -158,7 +158,7 @@ class GameScreenOld : Screen {
         if (obstacleTimer >= GameConfig.OBSTACLE_SPAWN_TIME) {
             obstacleTimer = 0f
 
-            val obstacleX = MathUtils.random(0f + Obstacle.BOUNDS_RADIUS, GameConfig.WORLD_WIDTH - Obstacle.BOUNDS_RADIUS)
+            val obstacleX = MathUtils.random(0f + Obstacle.HALF_SIZE, GameConfig.WORLD_WIDTH - Obstacle.HALF_SIZE)
             val obstacle = Obstacle()
 
             obstacle.setPosition(obstacleX, GameConfig.WORLD_HEIGHT)
@@ -174,11 +174,11 @@ class GameScreenOld : Screen {
     }
 
     override fun pause() {
-
+        // Not needed for the moment
     }
 
     override fun resume() {
-
+        // Not needed for the moment
     }
 
     override fun resize(width: Int, height: Int) {

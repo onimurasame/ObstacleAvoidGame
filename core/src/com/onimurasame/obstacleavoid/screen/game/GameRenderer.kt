@@ -1,20 +1,16 @@
 package com.onimurasame.obstacleavoid.screen.game
 
-import com.badlogic.gdx.Screen
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.FitViewport
-import com.badlogic.gdx.utils.viewport.Viewport
 import com.onimurasame.obstacleavoid.config.AssetPath
-import com.onimurasame.obstacleavoid.config.DifficultyLevel
 import com.onimurasame.obstacleavoid.config.GameConfig
 import com.onimurasame.obstacleavoid.entity.Obstacle
-import com.onimurasame.obstacleavoid.entity.Player
 import com.onimurasame.obstacleavoid.util.*
 import com.onimurasame.obstacleavoid.util.debug.DebugCameraController
 
@@ -34,26 +30,44 @@ class GameRenderer(private val controller: GameController) : Disposable {
     private val layout = GlyphLayout()
 
 
-    fun render(delta: Float) {
+    fun render() {
         // Debug Camera
         debugCameraController.handleDebugInput()
         debugCameraController.applyTo(camera)
 
         clearScreen()
-        renderer.projectionMatrix = camera.combined
+
+        renderDebug()
 
         renderUi()
 
         viewport.drawGrid(renderer)
 
+    }
+
+    private fun renderDebug() {
+        viewport.apply()
+
+        renderer.projectionMatrix = camera.combined
+
+        val oldColor = renderer.color.cpy()
+        renderer.color = Color.BLUE
+
+        renderer.use {
+            renderer.line(Obstacle.HALF_SIZE, 0f, Obstacle.HALF_SIZE, GameConfig.WORLD_HEIGHT)
+            renderer.line(GameConfig.WORLD_WIDTH - Obstacle.HALF_SIZE, 0f, GameConfig.WORLD_WIDTH - Obstacle.HALF_SIZE, GameConfig.WORLD_HEIGHT)
+        }
+
+        renderer.color = oldColor
+
         renderer.use {
             controller.player.drawDebug(renderer)
             controller.obstacles.forEach { it.drawDebug(renderer) }
         }
-
     }
 
     private fun renderUi() {
+        uiViewport.apply()
 
         batch.projectionMatrix = uiCamera.combined
 

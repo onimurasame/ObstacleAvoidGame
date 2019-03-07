@@ -14,15 +14,15 @@ class GameScreen : Screen {
 
     override fun render(delta: Float) {
         controller.update(delta)
-        renderer.render(delta)
+        renderer.render()
     }
 
     override fun pause() {
-
+        // Not needed for the moment
     }
 
     override fun resume() {
-
+        // Not needed for the moment
     }
 
     override fun resize(width: Int, height: Int) {

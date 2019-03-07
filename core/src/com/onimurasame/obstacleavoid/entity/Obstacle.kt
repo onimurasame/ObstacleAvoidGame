@@ -5,14 +5,14 @@ import com.badlogic.gdx.math.Circle
 class Obstacle : GameObjectBase(){
 
     companion object {
-        const val BOUNDS_RADIUS = 0.3f
-        const val SIZE = BOUNDS_RADIUS * 2
+        const val HALF_SIZE = 0.3f
+        const val SIZE = HALF_SIZE * 2
     }
 
     var ySpeed = 0.1f
     var isHit = false
 
-    override val bounds: Circle = Circle(x, y, Obstacle.BOUNDS_RADIUS)
+    override val bounds: Circle = Circle(x, y, Obstacle.HALF_SIZE)
 
     fun update() {
         y -= ySpeed
