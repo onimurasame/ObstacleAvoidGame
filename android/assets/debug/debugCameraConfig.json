@@ -1,0 +1,17 @@
+{
+  "maxZoomIn": "0.25",
+  "mazZoomOut": "10",
+  "moveSpeed": "20",
+  "zoomSpeed": "2",
+
+  "leftKey": "Left",
+  "rightKey": "Right",
+  "upKey": "Up",
+  "downKey": "Down",
+
+  "zoomInKey": "Page Up",
+  "zoomOutKey": "Page Down",
+  "resetZoomKey": "Home",
+  "logKey": "End"
+
+}
