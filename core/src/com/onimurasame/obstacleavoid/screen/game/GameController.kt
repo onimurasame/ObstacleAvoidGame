@@ -1,18 +1,27 @@
 package com.onimurasame.obstacleavoid.screen.game
 
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.utils.Pools
 import com.onimurasame.obstacleavoid.config.DifficultyLevel
 import com.onimurasame.obstacleavoid.config.GameConfig
 import com.onimurasame.obstacleavoid.entity.Obstacle
 import com.onimurasame.obstacleavoid.entity.Player
 import com.onimurasame.obstacleavoid.util.GdxArray
+import com.onimurasame.obstacleavoid.util.isKeyPressed
 import com.onimurasame.obstacleavoid.util.isNotEmpty
+import com.onimurasame.obstacleavoid.util.logger
 
 
 class GameController {
 
-    private val startPlayerY = 1f
-    private val startPlayerX = GameConfig.WORLD_WIDTH / 2
+    companion object {
+            @JvmStatic
+            private val log = logger<GameController>()
+        }
+
+    private val startPlayerY = 1f - Player.HALF_SIZE
+    private val startPlayerX = (GameConfig.WORLD_WIDTH - Player.SIZE) / 2
 
     private var obstacleTimer = 0f
     private var scoreTimer = 0f
@@ -23,7 +32,7 @@ class GameController {
 
     val obstacles = GdxArray<Obstacle>()
 
-    var player: Player = Player().apply { setPosition(startPlayerX, startPlayerY) }
+    var player: Player = Player().apply { setPosition(startPlayerX, startPlayerY); setSize(Player.SIZE, Player.SIZE) }
         private set
     var score = 0
         private set
@@ -32,11 +41,20 @@ class GameController {
     var lives = GameConfig.LIVES_START
         private set
 
+    private val obstaclePool = Pools.get(Obstacle::class.java, 20)
 
     fun update(delta: Float) {
         if(gameOver) return
 
-        player.update()
+        var xSpeed = 0f
+
+        when {
+            Input.Keys.D.isKeyPressed() -> xSpeed = Player.MAX_X_SPEED
+            Input.Keys.A.isKeyPressed() -> xSpeed = -Player.MAX_X_SPEED
+        }
+
+        player.x += xSpeed
+
         blockPlayerFromLeavingTheWorld()
 
         createNewObstacle(delta)
@@ -48,8 +66,20 @@ class GameController {
         updateDisplayScore(delta)
 
         if (playerCollidedWithObstacle()) {
+            log.debug("Collision detected...")
             lives--
+
+            when {
+                gameOver -> log.debug("Game Over!")
+                else -> restart()
+            }
         }
+    }
+
+    private fun restart() {
+        obstaclePool.freeAll(obstacles)
+        obstacles.clear()
+        player.setPosition(startPlayerX, startPlayerY)
     }
 
     private fun removePastObstacles() {
@@ -58,6 +88,7 @@ class GameController {
             val minObstacleY = -Obstacle.SIZE
 
             if (first.y < minObstacleY) {
+                obstaclePool.free(first)
                 obstacles.removeValue(first, true)
             }
         }
@@ -98,10 +129,11 @@ class GameController {
         if (obstacleTimer >= GameConfig.OBSTACLE_SPAWN_TIME) {
             obstacleTimer = 0f
 
-            val obstacleX = MathUtils.random(0f + Obstacle.HALF_SIZE, GameConfig.WORLD_WIDTH - Obstacle.HALF_SIZE)
-            val obstacle = Obstacle()
+            val obstacleX = MathUtils.random(0f, GameConfig.WORLD_WIDTH - Obstacle.SIZE)
+            val obstacle = obstaclePool.obtain()
 
             obstacle.setPosition(obstacleX, GameConfig.WORLD_HEIGHT)
+            obstacle.setSize(Obstacle.SIZE, Obstacle.SIZE)
             obstacle.ySpeed = difficultyLevel.obstacleSpeed
 
             obstacles.add(obstacle)
@@ -110,6 +142,6 @@ class GameController {
     }
 
     private fun blockPlayerFromLeavingTheWorld() {
-        player.x = MathUtils.clamp(player.x, Player.HALF_SIZE, GameConfig.WORLD_WIDTH - Player.HALF_SIZE)
+        player.x = MathUtils.clamp(player.x, 0f, GameConfig.WORLD_WIDTH - Player.SIZE)
     }
 }
