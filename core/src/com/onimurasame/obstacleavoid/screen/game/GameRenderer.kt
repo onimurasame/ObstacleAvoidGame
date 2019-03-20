@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -14,11 +13,9 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.onimurasame.obstacleavoid.config.AssetDescriptors
-import com.onimurasame.obstacleavoid.config.AssetPath.BACKGROUND_TEXTURE
-import com.onimurasame.obstacleavoid.config.AssetPath.OBSTACLE_TEXTURE
-import com.onimurasame.obstacleavoid.config.AssetPath.PLAYER_TEXTURE
 import com.onimurasame.obstacleavoid.config.GameConfig
 import com.onimurasame.obstacleavoid.config.GameConfig.WORLD_WIDTH
+import com.onimurasame.obstacleavoid.config.RegionNames
 import com.onimurasame.obstacleavoid.entity.Obstacle
 import com.onimurasame.obstacleavoid.entity.Player
 import com.onimurasame.obstacleavoid.util.*
@@ -43,12 +40,16 @@ class GameRenderer(assetManager: AssetManager, private val controller: GameContr
     }
 
     private val uiFont: BitmapFont = assetManager[AssetDescriptors.FONT]
-    private val playerTexture = assetManager[AssetDescriptors.PLAYER]
-    private val obstacleTexture = assetManager[AssetDescriptors.OBSTACLE]
-    private val backgroundTexture = assetManager[AssetDescriptors.BACKGROUND]
+    private val gamePlayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
+
+    private val playerTexture = gamePlayAtlas[RegionNames.PLAYER]
+    private val obstacleTexture = gamePlayAtlas[RegionNames.OBSTACLE]
+    private val backgroundTexture = gamePlayAtlas[RegionNames.BACKGROUND]
 
 
     fun render() {
+        //batch.totalRenderCalls = 0
+
         // Debug Camera
         debugCameraController.handleDebugInput()
         debugCameraController.applyTo(camera)
@@ -74,6 +75,7 @@ class GameRenderer(assetManager: AssetManager, private val controller: GameContr
 
         viewport.drawGrid(renderer)
 
+        //log.debug("Total Render Calls = ${batch.totalRenderCalls}")
     }
 
     private fun renderGameplay() {
